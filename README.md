@@ -1,21 +1,20 @@
 # S3 Cleanup Tool
 
-A lightweight Python script to remove specified IDs from CSVs and ZIPs under an S3 prefix, then upload cleaned files to a new prefix. Perfect for bulk‐removal of accession IDs (e.g., `GCA_013364925.1`) across thousands of Sourmash database files.
+A standalone Python script to remove specified IDs from CSVs and ZIPs under an S3 prefix and upload cleaned files to a new prefix.
 
-## Quick Start
+## Usage
 
-1. **Install dependencies** (Python 3.8+):
+1. **Save the Python script** (e.g., `remove_id_and_publish.py`) to your local machine.
+2. **Install required packages** (once) with:
 
    ```bash
-   git clone https://github.com/YourUser/s3-cleanup-tool.git
-   cd s3-cleanup-tool
-   pip install -r requirements.txt
+   pip install boto3 tqdm
    ```
-2. **Configure AWS credentials** (via `~/.aws/credentials` or environment vars).
-3. **Run the script**:
+3. **Ensure AWS credentials** are set (via `~/.aws/credentials` or environment variables).
+4. **Run the script** directly:
 
    ```bash
-   src/remove_id_and_publish.py \
+   python3 remove_id_and_publish.py \
      -i ID1,ID2,ID3 \
      --src-prefix sourmash-databases/k21/ \
      --dst-prefix sourmash-databases-2506/k21/ \
@@ -24,18 +23,13 @@ A lightweight Python script to remove specified IDs from CSVs and ZIPs under an 
      [--workdir ./WORK]
    ```
 
-   * `-i`: comma‐separated IDs to remove.
-   * `--src-prefix`: S3 prefix containing original CSVs/ZIPs.
-   * `--dst-prefix`: S3 prefix where cleaned files will be written.
-   * `--exclude-db`: skip any database (subfolder) whose name contains these substrings.
-   * `--region`: AWS region (optional).
-   * `--workdir`: local directory for ZIP extraction (defaults to `./WORK`).
+**Arguments:**
 
-## Summary of Behavior
+* `-i`: comma-separated list of IDs to remove.
+* `--src-prefix`: S3 prefix where original CSVs/ZIPs reside.
+* `--dst-prefix`: S3 prefix for cleaned files.
+* `--exclude-db` (optional): comma-separated substrings; skip databases whose names contain these.
+* `--region` (optional): AWS region.
+* `--workdir` (optional): local folder for ZIP extraction (defaults to `./WORK`).
 
-* **CSV files**: downloads → removes rows where “name” matches any ID → re‐uploads.
-* **ZIP files**: downloads → extracts → reads `SOURMASH-MANIFEST.csv` to find matching IDs → deletes related signature files → re‐zips (with a mini progress bar) → re‐uploads.
-* **Progress bars**: one bold bar for total steps, dim bars for each file’s byte transfers.
-* **Final table**: shows “✓” (blue) if an ID was cleaned in a specific database, “✗” (red) otherwise.
-
-That’s it—clone, configure AWS, and run with your list of IDs. Cleaned files are safely written under a new prefix, never overwriting the original `sourmash-databases/` content.
+That’s it—just the script and this README. No extra files needed.
